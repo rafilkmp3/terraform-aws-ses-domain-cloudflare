@@ -41,24 +41,9 @@ resource "cloudflare_record" "dkim" {
   value = "${element(aws_ses_domain_dkim.main.dkim_tokens, count.index)}.dkim.amazonses.com"
 }
 
-# #
-# # SES MAIL FROM Domain
-# #
-
-# resource "aws_ses_domain_mail_from" "main" {
-#   domain           = "${aws_ses_domain_identity.main.domain}"
-#   mail_from_domain = "${var.domain_name}"
-# }
-
-# # SPF validaton record
-# resource "cloudflare_record" "spf_mail_from" {
-#   domain = "${var.domain_name}"
-#   name   = "${aws_ses_domain_mail_from.main.mail_from_domain}"
-#   type   = "TXT"
-#   value  = "v=spf1 include:amazonses.com -all"
-# }
 
 resource "cloudflare_record" "spf_domain" {
+  count  = var.enable_spf_domain ? 1 : 0
   domain = var.domain_name
   name   = "@"
   type   = "TXT"
@@ -69,15 +54,11 @@ resource "cloudflare_record" "spf_domain" {
 data "aws_region" "current" {
 }
 
-# resource "cloudflare_record" "mx_send_mail_from" {
-#   domain = "${var.domain_name}"
-#   name   = "${aws_ses_domain_mail_from.main.mail_from_domain}"
-#   type   = "MX"
-#   value  = "10 feedback-smtp.${data.aws_region.current.name}.amazonses.com"
-# }
+
 
 # Receiving MX Record
 resource "cloudflare_record" "mx_receive" {
+  count  = var.enable_mx_receive ? 1 : 0
   domain = var.domain_name
   name   = "@"
   type   = "MX"
@@ -88,6 +69,7 @@ resource "cloudflare_record" "mx_receive" {
 # DMARC TXT Record
 #
 resource "cloudflare_record" "txt_dmarc" {
+  count  = var.enable_txt_dmarc ? 1 : 0
   domain = var.domain_name
   name   = "_dmarc"
   type   = "TXT"
@@ -108,4 +90,27 @@ resource "cloudflare_record" "txt_dmarc" {
 #     bucket_name       = "${var.receive_s3_bucket}"
 #     object_key_prefix = "${var.receive_s3_prefix}"
 #   }
+# }
+# resource "cloudflare_record" "mx_send_mail_from" {
+#   domain = "${var.domain_name}"
+#   name   = "${aws_ses_domain_mail_from.main.mail_from_domain}"
+#   type   = "MX"
+#   value  = "10 feedback-smtp.${data.aws_region.current.name}.amazonses.com"
+# }
+
+# #
+# # SES MAIL FROM Domain
+# #
+
+# resource "aws_ses_domain_mail_from" "main" {
+#   domain           = "${aws_ses_domain_identity.main.domain}"
+#   mail_from_domain = "${var.domain_name}"
+# }
+
+# # SPF validaton record
+# resource "cloudflare_record" "spf_mail_from" {
+#   domain = "${var.domain_name}"
+#   name   = "${aws_ses_domain_mail_from.main.mail_from_domain}"
+#   type   = "TXT"
+#   value  = "v=spf1 include:amazonses.com -all"
 # }

@@ -5,8 +5,29 @@ variable "domain_name" {
 
 variable "enable_verification" {
   description = "Control whether or not to verify SES DNS records."
-  type        = string
+  type        = bool
   default     = true
+}
+variable "enable_spf_domain" {
+  description = "Control whether or not create SPF DNS records."
+  type        = bool
+  default     = true
+}
+variable "enable_mx_receive" {
+  description = "Control whether or not to create DNS MX SES receive records."
+  type        = bool
+  default     = true
+}
+variable "enable_txt_dmarc" {
+  description = "Control whether or not create txt DMARC DNS records."
+  type        = bool
+  default     = true
+}
+
+
+variable "mail_from_domain" {
+  description = " Subdomain (of the route53 zone) which is to be used as MAIL FROM address"
+  type        = string
 }
 
 # variable "from_addresses" {
@@ -14,10 +35,6 @@ variable "enable_verification" {
 #   type        = "list"
 # }
 
-variable "mail_from_domain" {
-  description = " Subdomain (of the route53 zone) which is to be used as MAIL FROM address"
-  type        = string
-}
 
 # variable "receive_s3_bucket" {
 #   description = "Name of the S3 bucket to store received emails."
